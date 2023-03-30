@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
     {
         sent_chars = sendto(sockfd, (const char *)hello, strlen(hello),
             MSG_CONFIRM, (const struct sockaddr *) &servaddr,
-                sizeof(servaddr)) != strlen(hello)
+                sizeof(servaddr));
 		if (sent_chars != strlen(hello)) {
 			perror("couldn't send the message");
 			exit(EXIT_FAILURE);
@@ -58,7 +58,7 @@ int main(int argc, char **argv) {
 			perror("something went wrong while receiving response");
 			exit(EXIT_FAILURE);
 		}
-        buffer[n] = '\0';
+        buffer[recv_chars] = '\0';
         printf("Server : %s\n", buffer); fflush(stdout);
     }
 

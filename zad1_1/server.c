@@ -47,17 +47,17 @@ int main() {
 	len = sizeof(cliaddr); //len is value/result
     while(1)
     {
-        n = recvfrom(sockfd, (char *)buffer, MAXLINE,
+        recv_chars = recvfrom(sockfd, (char *)buffer, MAXLINE,
                     MSG_WAITALL, ( struct sockaddr *) &cliaddr,
                     &len);
 		if (recv_chars < 0) {
 			perror("something went wrong while receiving response");
 			exit(EXIT_FAILURE);
 		}
-        buffer[n] = '\0';
+        buffer[recv_chars] = '\0';
         printf("Client : %s\n", buffer); fflush(stdout);
 
-        sendto(sockfd, (const char *)hello, strlen(hello),
+        sent_chars = sendto(sockfd, (const char *)hello, strlen(hello),
             MSG_CONFIRM, (const struct sockaddr *) &cliaddr,
                 len);
 		if (sent_chars != strlen(hello)) {
