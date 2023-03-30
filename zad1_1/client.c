@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
 	const char *hello = "Hello from client";
 	struct sockaddr_in	 servaddr;
 
-    int i, num_msg;
+    int i, num_msg = 1;
 
 	int sent_chars, recv_chars;
 	socklen_t len;
@@ -26,6 +26,9 @@ int main(int argc, char **argv) {
     if (argc > 1) {
         num_msg = atoi(argv[1]);
     }
+	if (argc > 2) {
+		hello = argv[2];
+	}
 
 	// Creating socket file descriptor
 	if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) {
