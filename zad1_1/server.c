@@ -19,7 +19,7 @@ int main() {
 	struct sockaddr_in servaddr, cliaddr;
 
 	socklen_t len;
-    int n;
+    int sent_chars, recv_chars;
 
 	// Creating socket file descriptor
 	if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) {
@@ -50,12 +50,20 @@ int main() {
         n = recvfrom(sockfd, (char *)buffer, MAXLINE,
                     MSG_WAITALL, ( struct sockaddr *) &cliaddr,
                     &len);
+		if (recv_chars < 0) {
+			perror("something went wrong while receiving response");
+			exit(EXIT_FAILURE);
+		}
         buffer[n] = '\0';
         printf("Client : %s\n", buffer); fflush(stdout);
 
         sendto(sockfd, (const char *)hello, strlen(hello),
             MSG_CONFIRM, (const struct sockaddr *) &cliaddr,
                 len);
+		if (sent_chars != strlen(hello)) {
+			perror("couldn't send the message");
+			exit(EXIT_FAILURE);
+		}
         printf("Hello message sent.\n"); fflush(stdout);
     }
 
