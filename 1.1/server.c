@@ -17,7 +17,7 @@ int main() {
 	char buffer[MAXLINE];
 	const char *hello = "Hello from server";
 	struct sockaddr_in servaddr, cliaddr;
-	
+
 	socklen_t len;
     int n;
 
@@ -26,15 +26,15 @@ int main() {
 		perror("socket creation failed");
 		exit(EXIT_FAILURE);
 	}
-	
+
 	memset(&servaddr, 0, sizeof(servaddr));
 	memset(&cliaddr, 0, sizeof(cliaddr));
-	
+
 	// Filling server information
 	servaddr.sin_family = AF_INET; // IPv4
 	servaddr.sin_addr.s_addr = INADDR_ANY;
 	servaddr.sin_port = htons(PORT);
-	
+
 	// Bind the socket with the server address
 	if ( bind(sockfd, (const struct sockaddr *)&servaddr,
 			sizeof(servaddr)) < 0 )
@@ -42,7 +42,7 @@ int main() {
 		perror("bind failed");
 		exit(EXIT_FAILURE);
 	}
-	
+
 
 	len = sizeof(cliaddr); //len is value/result
     while(1)
@@ -58,6 +58,6 @@ int main() {
                 len);
         printf("Hello message sent.\n"); fflush(stdout);
     }
-	
+
 	return 0;
 }

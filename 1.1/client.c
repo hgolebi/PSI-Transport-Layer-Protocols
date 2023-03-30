@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
 
     int i, num_msg;
 
-	int n;
+	int sent_chars, recv_chars;
 	socklen_t len;
 
     if (argc > 1) {
@@ -34,26 +34,37 @@ int main(int argc, char **argv) {
 	}
 
 	memset(&servaddr, 0, sizeof(servaddr));
-	
+
 	// Filling server information
 	servaddr.sin_family = AF_INET;
 	servaddr.sin_port = htons(PORT);
 	servaddr.sin_addr.s_addr = INADDR_ANY;
-	
+
 	for (i = 0; i < num_msg; i = i+1)
     {
-        sendto(sockfd, (const char *)hello, strlen(hello),
+        sent_chars = sendto(sockfd, (const char *)hello, strlen(hello),
             MSG_CONFIRM, (const struct sockaddr *) &servaddr,
-                sizeof(servaddr));
+                sizeof(servaddr)) != strlen(hello)
+		if (sent_chars != strlen(hello)) {
+			perror("couldn't send the message");
+			exit(EXIT_FAILURE);
+		}
         printf("Hello message sent.\n");
-            
-        n = recvfrom(sockfd, (char *)buffer, MAXLINE,
+
+        recv_chars = recvfrom(sockfd, (char *)buffer, MAXLINE,
                     MSG_WAITALL, (struct sockaddr *) &servaddr,
                     &len);
+		if (recv_chars < 0) {
+			perror("something went wrong while receiving response");
+			exit(EXIT_FAILURE);
+		}
         buffer[n] = '\0';
         printf("Server : %s\n", buffer); fflush(stdout);
     }
 
-	close(sockfd);
+	if (close(sockfd) < 0) {
+		perror("couldn't close file descriptor");
+		exit(EXIT_FAILURE);
+	}
 	return 0;
 }
