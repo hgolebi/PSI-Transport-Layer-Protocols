@@ -5,7 +5,7 @@ localIP = "127.0.0.1"
 localPort = 8080
 bufferSize = 1024
 
-msgFromServer = "Hello UDP Client"
+msgFromServer = "Reply from server"
 bytesToSend = str.encode(msgFromServer)
 
 # Create a datagram socket
@@ -28,11 +28,9 @@ while(True):
 
     address = bytesAddressPair[1]
 
-    clientMsg = "Message from Client:{}".format(message)
-    clientIP  = "Client IP Address:{}".format(address)
+    clientMsg = "Client ({}) : {}".format(address, message)
     
     print(clientMsg)
-    print(clientIP)
 
     # Sending a reply to client
 

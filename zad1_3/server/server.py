@@ -6,7 +6,7 @@ localIP = "127.0.0.1"
 localPort = 8080
 bufferSize = 1024
 
-msgFromServer = "Hello UDP Client"
+msgFromServer = "Reply from server"
 bytesToSend = str.encode(msgFromServer)
 
 # Create a datagram socket
@@ -15,7 +15,7 @@ UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 
 # Bind to address and ip
 
-UDPServerSocket.bind((localIP, localPort))
+UDPServerSocket.bind((socket.gethostname(), localPort))
 
 print("UDP server up and listening")
 
@@ -27,13 +27,13 @@ while(True):
 
     message = bytesAddressPair[0]
 
+    message = struct.unpack_from("@lh10s", message)
+    
     address = bytesAddressPair[1]
 
-    clientMsg = "Message from Client:{}".format(message)
-    clientIP  = "Client IP Address:{}".format(address)
+    clientMsg = "Client ({}) : {}".format(address ,message)
     
-    msg = struct.unpack_from("@lh10s", message)
-    print(msg)
+    print(clientMsg)
 
     # Sending a reply to client
 

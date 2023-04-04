@@ -7,6 +7,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include <netdb.h>
 
 #define PORT	 8080
 #define MAXLINE 1024
@@ -22,13 +23,16 @@ int main(int argc, char **argv) {
 	int sockfd;
 	char buffer[MAXLINE];
 	struct sockaddr_in	 servaddr;
-    struct msg send, *sendPtr;
+	struct hostent *hp, *gethostbyname();
+	char *aip;
+	
+    	struct msg send, *sendPtr;
 
 	int n;
 	socklen_t len;
 
-    if (argc != 4) {
-        printf("3 arguments required\n");
+    if (argc != 6) {
+        printf("5 arguments required\n");
         return 1;
     }
 
@@ -39,16 +43,24 @@ int main(int argc, char **argv) {
 	}
     
 	memset(&servaddr, 0, sizeof(servaddr));
-	
+	/*
 	// Filling server information
 	servaddr.sin_family = AF_INET;
 	servaddr.sin_port = htons(PORT);
 	servaddr.sin_addr.s_addr = INADDR_ANY;
-    
+	*/
+    	hp = gethostbyname(argv[1]);
+	
+	memcpy((char *) &servaddr.sin_addr, (char *) hp->h_addr, hp->h_length);
+	aip = inet_ntoa( *((struct in_addr*) hp->h_addr_list[0]));
+
+	printf("Server IP: %s\n", aip);
+	servaddr.sin_port = htons(atoi(argv[2]));
+
     // arguments to struct
-    send.a = atoi(argv[1]);
-    send.b = atoi(argv[2]);
-    strcpy(send.c, argv[3]);
+    send.a = atoi(argv[3]);
+    send.b = atoi(argv[4]);
+    strcpy(send.c, argv[5]);
     sendPtr = &send;
     
     sendto(sockfd, sendPtr, sizeof(send),
@@ -62,6 +74,9 @@ int main(int argc, char **argv) {
     buffer[n] = '\0';
     printf("Server : %s\n", buffer); fflush(stdout);
 
-	close(sockfd);
+	if (close(sockfd) < 0) {
+		perror("couldn't close file descriptor");
+		exit(EXIT_FAILURE);
+	}
 	return 0;
 }

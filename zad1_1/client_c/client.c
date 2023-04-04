@@ -9,8 +9,7 @@
 #include <netinet/in.h>
 #include <netdb.h>
 
-#define PORT	 8080
-#define MAXLINE 1024
+#define MAXLINE  1024
 
 // Driver code
 int main(int argc, char **argv) {
@@ -21,42 +20,36 @@ int main(int argc, char **argv) {
 	struct hostent *hp, *gethostbyname();
 	char *aip;
 
-	printf("Starting");
-    int i, num_msg = 1;
+	int i, num_msg = 3;
 
 	int sent_chars, recv_chars;
 	socklen_t len;
 
-    if (argc > 1) {
-        num_msg = atoi(argv[1]);
-    }
-    	/*
-	if (argc > 2) {
-		hello = argv[2];
+	if (argc != 3) {
+		perror("Wrong amount of arguments");
+		exit(EXIT_FAILURE);
 	}
-	*/
-
-	// Creating socket file descriptor
+	
 	if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) {
 		perror("socket creation failed");
 		exit(EXIT_FAILURE);
 	}
-	/*
 
 	memset(&servaddr, 0, sizeof(servaddr));
-
+	/*
 	// Filling server information
 	servaddr.sin_family = AF_INET;
 	servaddr.sin_port = htons(PORT);
 	servaddr.sin_addr.s_addr = INADDR_ANY;
 
 	*/
-	hp = gethostbyname(argv[2]);
+	hp = gethostbyname(argv[1]);
 	
 	memcpy((char *) &servaddr.sin_addr, (char *) hp->h_addr, hp->h_length);
 	aip = inet_ntoa( *((struct in_addr*) hp->h_addr_list[0]));
+	
 	printf("Server IP: %s\n", aip);
-	servaddr.sin_port = htons(atoi(argv[3]));
+	servaddr.sin_port = htons(atoi(argv[2]));
 
 	for (i = 0; i < num_msg; i = i+1)
     {
@@ -67,7 +60,7 @@ int main(int argc, char **argv) {
 			perror("couldn't send the message");
 			exit(EXIT_FAILURE);
 		}
-        printf("Hello message sent.\n");
+        printf("Hello message sent.\n"); fflush(stdout);
 
         recv_chars = recvfrom(sockfd, (char *)buffer, MAXLINE,
                     MSG_WAITALL, (struct sockaddr *) &servaddr,
