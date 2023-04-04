@@ -8,4 +8,4 @@ Z gotowego obrazu możemy uruchomić kontener korzystając z komendy:
 
 docker run -it --network z44_network --name *nazwa* *nazwa_obrazu*
 
-Dodatkowo dla klienta należy podać jako kolejne argumenty ww. komendy *nazwę_serwera*, *port_serwera* oraz 3 wartości do przesłania: *short int*, *long int*, *char[10]*
+Dodatkowo dla klienta należy podać jako kolejne argumenty ww. komendy *nazwę_serwera*, *port_serwera* oraz 3 wartości do przesłania: *long int*, *short int*, *char[10]*
