@@ -14,7 +14,7 @@ UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 
 # Bind to address and ip
 
-UDPServerSocket.bind((localIP, localPort))
+UDPServerSocket.bind((socket.gethostname(), localPort))
 
 print("UDP server up and listening")
 

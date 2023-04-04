@@ -7,6 +7,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include <netdb.h>
 
 #define PORT	 8080
 #define MAXLINE 1024
@@ -17,7 +18,10 @@ int main(int argc, char **argv) {
 	char buffer[MAXLINE];
 	const char *hello = "Hello from client";
 	struct sockaddr_in	 servaddr;
+	struct hostent *hp, *gethostbyname();
+	char *aip;
 
+	printf("Starting");
     int i, num_msg = 1;
 
 	int sent_chars, recv_chars;
@@ -26,15 +30,18 @@ int main(int argc, char **argv) {
     if (argc > 1) {
         num_msg = atoi(argv[1]);
     }
+    	/*
 	if (argc > 2) {
 		hello = argv[2];
 	}
+	*/
 
 	// Creating socket file descriptor
 	if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) {
 		perror("socket creation failed");
 		exit(EXIT_FAILURE);
 	}
+	/*
 
 	memset(&servaddr, 0, sizeof(servaddr));
 
@@ -42,6 +49,14 @@ int main(int argc, char **argv) {
 	servaddr.sin_family = AF_INET;
 	servaddr.sin_port = htons(PORT);
 	servaddr.sin_addr.s_addr = INADDR_ANY;
+
+	*/
+	hp = gethostbyname(argv[2]);
+	
+	memcpy((char *) &servaddr.sin_addr, (char *) hp->h_addr, hp->h_length);
+	aip = inet_ntoa( *((struct in_addr*) hp->h_addr_list[0]));
+	printf("Server IP: %s\n", aip);
+	servaddr.sin_port = htons(atoi(argv[3]));
 
 	for (i = 0; i < num_msg; i = i+1)
     {

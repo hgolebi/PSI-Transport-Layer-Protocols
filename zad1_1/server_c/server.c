@@ -44,8 +44,9 @@ int main() {
 	}
 
 
-	len = sizeof(cliaddr); //len is value/result
-    while(1)
+	len = sizeof(cliaddr); //len is value/
+	printf("Socket port #%d\n", ntohs(servaddr.sin_port));
+    	while(1)
     {
         recv_chars = recvfrom(sockfd, (char *)buffer, MAXLINE,
                     MSG_WAITALL, ( struct sockaddr *) &cliaddr,
