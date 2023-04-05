@@ -80,7 +80,7 @@ int main(int argc, char **argv) {
 		perror("something went wrong while receiving response");
 		exit(EXIT_FAILURE);
 	}
-    buffer[n] = '\0';
+    buffer[recv_chars] = '\0';
     printf("Server : %s\n", buffer); fflush(stdout);
 
 	if (close(sockfd) < 0) {
