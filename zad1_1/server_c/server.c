@@ -8,14 +8,13 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
-#define PORT	 8080
 #define MAXLINE 1024
 
 // Driver code
 int main() {
 	int sockfd;
 	char buffer[MAXLINE];
-	const char *hello = "Hello from server";
+	const char *hello = "Reply from server";
 	struct sockaddr_in servaddr, cliaddr;
 
 	socklen_t len;
@@ -33,7 +32,7 @@ int main() {
 	// Filling server information
 	servaddr.sin_family = AF_INET; // IPv4
 	servaddr.sin_addr.s_addr = INADDR_ANY;
-	servaddr.sin_port = htons(PORT);
+	servaddr.sin_port = 8080;
 
 	// Bind the socket with the server address
 	if ( bind(sockfd, (const struct sockaddr *)&servaddr,
@@ -44,10 +43,11 @@ int main() {
 	}
 
 
-	len = sizeof(cliaddr); //len is value/result
-    while(1)
-    {
-        recv_chars = recvfrom(sockfd, (char *)buffer, MAXLINE,
+	len = sizeof(cliaddr); //len is value/
+	printf("Socket port #%d\n", ntohs(servaddr.sin_port));
+    	while(1)
+    	{
+	recv_chars = recvfrom(sockfd, (char *)buffer, MAXLINE,
                     MSG_WAITALL, ( struct sockaddr *) &cliaddr,
                     &len);
 		if (recv_chars < 0) {
@@ -55,7 +55,7 @@ int main() {
 			exit(EXIT_FAILURE);
 		}
         buffer[recv_chars] = '\0';
-        printf("Client : %s\n", buffer); fflush(stdout);
+        printf("Client (%s) : %s\n", inet_ntoa(cliaddr.sin_addr), buffer); fflush(stdout);
 
         sent_chars = sendto(sockfd, (const char *)hello, strlen(hello),
             MSG_CONFIRM, (const struct sockaddr *) &cliaddr,
@@ -64,8 +64,8 @@ int main() {
 			perror("couldn't send the message");
 			exit(EXIT_FAILURE);
 		}
-        printf("Hello message sent.\n"); fflush(stdout);
-    }
+        printf("Reply sent.\n"); fflush(stdout);
+    	}
 
 	return 0;
 }

@@ -1,0 +1,6 @@
+FROM gcc:4.9
+COPY . /Client
+WORKDIR /Client/
+RUN gcc -o client_c client.c
+ENTRYPOINT ["./client_c"]
+
