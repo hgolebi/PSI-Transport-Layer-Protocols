@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
 	
     	struct msg send, *sendPtr;
 
-	int n;
+	int sent_chars, recv_chars;
 	socklen_t len;
 
     if (argc != 6) {
@@ -57,20 +57,29 @@ int main(int argc, char **argv) {
 	printf("Server IP: %s\n", aip);
 	servaddr.sin_port = htons(atoi(argv[2]));
 
-    // arguments to struct
-    send.a = atoi(argv[3]);
-    send.b = atoi(argv[4]);
-    strcpy(send.c, argv[5]);
-    sendPtr = &send;
+	// arguments to struct
+	send.a = atoi(argv[3]);
+	send.b = atoi(argv[4]);
+	strcpy(send.c, argv[5]);
+	sendPtr = &send;
     
-    sendto(sockfd, sendPtr, sizeof(send),
-        MSG_CONFIRM, (const struct sockaddr *) &servaddr,
-            sizeof(servaddr));
-    printf("Message sent.\n");
+	sent_chars = sendto(sockfd, sendPtr, sizeof(send),
+		MSG_CONFIRM, (const struct sockaddr *) &servaddr,
+		sizeof(servaddr));
+	if (sent_chars != sizeof(send)) {
+		perror("couldn't send the message");
+		exit(EXIT_FAILURE);
+	}
+	
+	printf("Message sent.\n");
         
-    n = recvfrom(sockfd, (char *)buffer, MAXLINE,
-                MSG_WAITALL, (struct sockaddr *) &servaddr,
-                &len);
+    	recv_chars = recvfrom(sockfd, (char *)buffer, MAXLINE,
+                     MSG_WAITALL, (struct sockaddr *) &servaddr,
+		     &len);
+	if (recv_chars < 0) {
+		perror("something went wrong while receiving response");
+		exit(EXIT_FAILURE);
+	}
     buffer[n] = '\0';
     printf("Server : %s\n", buffer); fflush(stdout);
 
