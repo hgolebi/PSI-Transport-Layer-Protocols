@@ -33,29 +33,31 @@ int main(int argc, char **argv)
     
     // Set port and IP the same as server-side:
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(8000);
-    server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    // server_addr.sin_port = htons(8000);
+    // server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
-    // if (argc != 3) {
-    //     printf("Wrong number of arguments. Please insert 2 arguments.\n");
-    //     return -1;
-    // }
-    // hp = gethostbyname(argv[1]);
-    // if (hp == 0) {
-    //     printf("Couldn't resolve given address\n");
-    //     return -1;
-    // }
-    // char **endptr;
-	// int port = strtol(argv[2], endptr, 10);
-    // if (port <= 0) {
-    //     printf("Given port was wrong.\n");
-    //     return -1;
-    // }
-	// memcpy((char *) &server_addr.sin_addr, (char *) hp->h_addr, hp->h_length);
-	// aip = inet_ntoa( *((struct in_addr*) hp->h_addr_list[0]));
+    if (argc != 3) {
+        printf("Wrong number of arguments. Please insert 2 arguments.\n");
+        return -1;
+    }
+    hp = gethostbyname(argv[1]);
+    if (hp == 0) {
+        printf("Couldn't resolve given address\n");
+        return -1;
+    }
+    char *endptr;
+    int port;
+	port = strtol(argv[2], &endptr, 10);
+    if (port <= 0) {
+        printf("Given port was wrong.\n");
+        return -1;
+    }
+	memcpy((char *) &server_addr.sin_addr, (char *) hp->h_addr, hp->h_length);
+	aip = inet_ntoa( *((struct in_addr*) hp->h_addr_list[0]));
 	
-	// printf("Server IP: %s\n", aip);
-	// server_addr.sin_port = htons(atoi(argv[2]));
+    // int po = atoi(argv[2]);
+	printf("Server IP: %s:%d\n", aip, port);
+	server_addr.sin_port = htons(port);
     
 
 
