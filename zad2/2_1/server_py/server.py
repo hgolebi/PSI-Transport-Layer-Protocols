@@ -1,7 +1,8 @@
 import socket
 from sys import argv
 
-HOST = "127.0.0.1"  
+# HOST = "127.0.0.1" 
+HOST = socket.gethostname()
 PORT = 8000  
 RESPONSE = b"Odpowiedz serwera"
 
