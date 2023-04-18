@@ -23,8 +23,8 @@ int main(void)
     
     // Set port and IP:
     server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = INADDR_ANY;
     server_addr.sin_port = htons(2000);
-    server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
     
     // Bind to the set port and IP:
     if(bind(socket_desc, (struct sockaddr*)&server_addr, sizeof(server_addr))<0){
@@ -38,6 +38,7 @@ int main(void)
         printf("Error while listening\n");
         return -1;
     }
+    printf("Listening on port: %i\n", ntohs(server_addr.sin_port));
     printf("\nListening for incoming connections.....\n");
     
     
