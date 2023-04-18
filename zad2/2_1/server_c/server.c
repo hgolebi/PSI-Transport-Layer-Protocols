@@ -5,17 +5,16 @@
 
 int main(void)
 {
-    int socket_desc, client_sock, client_size;
+    int socket_desc, client_sock, client_size, rval;
     struct sockaddr_in server_addr, client_addr;
     char server_message[2000], client_message[2000];
     
-    // Clean buffers:
+    // Prepare response buffer:
     memset(server_message, '\0', sizeof(server_message));
-    memset(client_message, '\0', sizeof(client_message));
+    strcpy(server_message, "This is the server's message.");
     
     // Create socket:
     socket_desc = socket(AF_INET, SOCK_STREAM, 0);
-    
     if(socket_desc < 0){
         printf("Error while creating socket\n");
         return -1;
@@ -35,39 +34,49 @@ int main(void)
     printf("Done with binding\n");
     
     // Listen for clients:
-    if(listen(socket_desc, 1) < 0){
+    if(listen(socket_desc, 5) < 0){
         printf("Error while listening\n");
         return -1;
     }
     printf("\nListening for incoming connections.....\n");
     
-    // Accept an incoming connection:
-    client_size = sizeof(client_addr);
-    client_sock = accept(socket_desc, (struct sockaddr*)&client_addr, &client_size);
     
-    if (client_sock < 0){
-        printf("Can't accept\n");
-        return -1;
-    }
-    printf("Client connected at IP: %s and port: %i\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
-    
-    // Receive client's message:
-    if (recv(client_sock, client_message, sizeof(client_message), 0) < 0){
-        printf("Couldn't receive\n");
-        return -1;
-    }
-    printf("Msg from client: %s\n", client_message);
-    
-    // Respond to client:
-    strcpy(server_message, "This is the server's message.");
-    
-    if (send(client_sock, server_message, strlen(server_message), 0) < 0){
-        printf("Can't send\n");
-        return -1;
-    }
-    
-    // Closing the socket:
-    close(client_sock);
+    do {
+        // Accept an incoming connection:
+        client_size = sizeof(client_addr);
+        client_sock = accept(socket_desc, (struct sockaddr*)&client_addr, &client_size);
+        if (client_sock < 0){
+            printf("Can't accept\n");
+            return -1;
+        }
+        printf("Client connected at IP: %s and port: %i\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
+
+        // Receive client's message:
+        do {
+            memset(client_message, '\0', sizeof(client_message));
+            rval = read(client_sock, client_message, sizeof(client_message));
+            if (rval < 0){
+                printf("Couldn't receive, closing connection..\n");
+                break;
+            }
+            if (rval == 0){
+                printf("Nothing to read, closing connection..\n");
+            }
+            else {
+                printf("Msg from client: %s\n", client_message);
+
+                // Respond to client:
+
+                if (send(client_sock, server_message, strlen(server_message), 0) < 0){
+                    printf("Couldn't send response, closing connection..\n");
+                    break;
+                }
+            }
+        } while (rval > 0);
+
+        // Closing the socket:
+        close(client_sock);
+    } while(1);
     close(socket_desc);
     
     return 0;

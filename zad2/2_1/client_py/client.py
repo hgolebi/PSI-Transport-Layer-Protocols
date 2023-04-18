@@ -1,11 +1,16 @@
 import socket
+from sys import argv
 
-HOST = "127.0.0.1"  # The server's hostname or IP address
-PORT = 65432  # The port used by the server
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.connect((HOST, PORT))
-    s.sendall(b"Hello, world")
+    try:
+        s.connect((argv[1], int(argv[2])))
+    except:
+        print("Couldn't connect to the server.")
+        exit(1)
+    print("Connected.")
+    s.send(b"aaaaaBBBBBcccccDDDDDeeeeeFF")
+    print("Message sent.")
     data = s.recv(1024)
 
-print(f"Received {data.decode('UTF-8')}")
+print(f"Received response: {data.decode('UTF-8')}")
