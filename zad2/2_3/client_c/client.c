@@ -15,13 +15,13 @@ int main(int argc, char **argv)
 {
     int socket_desc;
     struct sockaddr_in server_addr;
-    char server_message[2000], client_message[2000];
+    char server_message[2000];
+    const char *client_message = "Hello from non-blocking client";
     struct hostent *hp, *gethostbyname();
     char *aip;
 
     // Clean buffers:
     memset(server_message,'\0',sizeof(server_message));
-    memset(client_message,'\0',sizeof(client_message));
     
     // Create socket:
     socket_desc = socket(AF_INET, SOCK_STREAM, 0);
@@ -79,7 +79,7 @@ int main(int argc, char **argv)
     // Send connection request to server:
     if(connect(socket_desc, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0){
         if (errno != EINPROGRESS){
-            perror("Unable to connect\n");
+            perror("Couldn't connect to file descriptor\n");
             return -1;
         }
         fd_set write_fds;
@@ -89,6 +89,7 @@ int main(int argc, char **argv)
         FD_SET(socket_desc, &write_fds);
 
         timeout.tv_sec = 5; // 5 seconds timeout
+        timeout.tv_usec = 0;
 
         int retval;
         retval = select(socket_desc + 1, NULL, &write_fds, NULL, &timeout);
@@ -97,22 +98,18 @@ int main(int argc, char **argv)
             return -1;
         }
         if (retval < 0) {
-            perror("Unable to connect\n");
+            perror("Select: unable to connect\n");
             return -1;
         }
-    }
-
-    // Get input from the user:
-    printf("Enter message: ");
-    gets(client_message);
-    
+    }    
     
     // Send the message to server:
     if(send(socket_desc, client_message, strlen(client_message), 0) < 0){
         perror("Unable to send message\n");
         return -1;
     }
-    
+    printf("Message sent.\n");
+
     // Checking if socket is ready to read
     fd_set read_fds;
     struct timeval timeout;
@@ -125,7 +122,7 @@ int main(int argc, char **argv)
     int retval;
     retval = select(socket_desc + 1, &read_fds, NULL, NULL, &timeout);
     if (retval == 0) {
-        printf("Connection timed out.\n");
+        printf("Didn't receive response. Connection timed out.\n");
         return -1;
     }
     if (retval < 0) {
