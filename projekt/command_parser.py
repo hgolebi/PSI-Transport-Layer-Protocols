@@ -10,17 +10,15 @@ Available commands:
 EXIT_CODE = 1
 INVALID_COMMAND_MESSAGE = "Invalid command. Type 'help' to list available commands."
 
-def ping_command(message):
+def ping_command(message_list):
   pass
 
-def read_command(message):
+def read_command(message_list):
   pass
 
-def config_command(message):
+def config_command(message_list):
   pass
 
-def invalid_command():
-  pass
 
 def analyze_message(message):
   separeted_message = message.lower().split()
