@@ -12,6 +12,9 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     try:
         while(True):
             data = s.recv(1024)
+            if not data:
+                print("Connection closed.")
+                break
             print(data.decode("UTF-8"))
             message = input("> ")
             s.send(message.encode())
