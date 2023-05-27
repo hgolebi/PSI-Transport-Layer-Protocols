@@ -3,8 +3,7 @@ from sys import argv
 from command_parser import analyze_message, HELP_MESSAGE, EXIT_CODE
 from logger import Logger
 
-# HOST = "127.0.0.1"
-HOST = socket.gethostname()
+HOST = socket.gethostbyname(socket.gethostname())
 PORT = 8000
 
 START_MESSAGE = "Connected to the gateway." + HELP_MESSAGE
