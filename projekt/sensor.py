@@ -3,6 +3,7 @@ from sys import argv
 import random
 
 SENSOR_ID = random.randrange(0, 2**16-1)
+# SENSOR_ID = 5560
 REGISTERS = [10 * n for n in range(8)]
 ADDRESS = socket.gethostbyname(socket.gethostname())
 

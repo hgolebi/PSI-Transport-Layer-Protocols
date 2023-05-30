@@ -1,4 +1,6 @@
 import socket
+import threading
+from time import sleep
 
 ADDRESS = socket.gethostbyname(socket.gethostname())
 PORT = 8123
@@ -7,10 +9,13 @@ class DeviceManager:
     devices = {}
     
     @classmethod
-    def start(cls, address, port):
+    def start(cls, address, port, logger):
         with socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM) as s:
             s.bind((address, port))
-            print("UDP server up and listening on ", address, port)
+            # print("UDP server up and listening on ", address, port)
+            cls.logger = logger
+            cls.logger.log(f"UDP server up and listening on {address} {port}")
+            threading.Thread(target=DeviceManager.check_devices, daemon=True).start()
             while(True):
                 # device registration
                 data, device = s.recvfrom(2)
@@ -23,6 +28,8 @@ class DeviceManager:
                     print("Error while sending response")
                     continue
                 cls.devices[id] = device
+                cls.logger.log(f"Device {id=} added to connected list")
+
 
     @classmethod
     def read_from_device(cls, device_id, register):
@@ -64,3 +71,39 @@ class DeviceManager:
     @classmethod
     def list_devices(cls):
         return(cls.devices)
+
+    @classmethod
+    def check_devices(cls):
+        while True:
+            for id, dev in list(cls.devices.items()):
+                with socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM) as s:
+                    try:
+                        s.settimeout(5)
+                        # communication with device
+                        ret = s.sendto(int(0).to_bytes(3, 'big'), dev)
+                        if ret != 3:
+                            cls.logger.log(f"Error while pinging device {id=} (sending)")
+                            # print("Error while sending message")
+                            cls.devices.pop(id)
+                            cls.logger.log(f"Removed device {id=} from active list")
+                            break
+
+                        data, _ = s.recvfrom(2)
+                        if not data:
+                            cls.logger.log(f"Error while pinging device {id=} (receiving)")
+                            cls.devices.pop(id)
+                            cls.logger.log(f"Removed device {id=} from active list")
+                            break
+                            # print("Error while receiving response")
+                    except TimeoutError:
+                        cls.logger.log(f"Error while pinging device {id=} (timeout)")
+                        # print("Error while sending message")
+                        cls.devices.pop(id)
+                        cls.logger.log(f"Removed device {id=} from active list")
+                    except Exception as e:
+                        cls.logger.log(f"Error while pinging device {id=} ({e})")
+                        cls.devices.pop(id)
+                        cls.logger.log(f"Removed device {id=} from active list")
+
+
+            sleep(10)

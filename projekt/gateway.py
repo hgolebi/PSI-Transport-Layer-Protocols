@@ -56,14 +56,14 @@ if len(argv) > 1 and argv[1].isdigit() and int(argv[1]) > 0:
 logger = Logger()
 
 # Initialize UDP server in another thread
-threading.Thread(None, DeviceManager.start, 'udp_server_thread', (HOST, UDP_PORT), daemon=True).start()
+threading.Thread(None, DeviceManager.start, 'udp_server_thread', (HOST, UDP_PORT, logger), daemon=True).start()
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind((HOST, PORT))
     s.setblocking(False)
     s.listen(10)
-    logger.log(f"Started listening on {HOST}:{PORT}")
+    logger.log(f"Started listening on {HOST} {PORT}")
     while True:
         try:
             rl, _, _ = select.select([s], [], [], 5)

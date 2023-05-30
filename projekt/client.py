@@ -1,6 +1,9 @@
 import socket
 from sys import argv
 
+if len(argv) != 3:
+    print('Invalid arguments. Please specify SERVER_ADDRESS and SERVER_PORT')
+    exit(-1)
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     try:

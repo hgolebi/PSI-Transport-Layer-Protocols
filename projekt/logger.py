@@ -8,7 +8,6 @@ class Logger:
             os.makedirs("logs")
         time = str(datetime.now())
         self.file_path = "logs/log_" + time.replace(" ", "_").replace(":", "-") + ".txt"
-        self.file = open(self.file_path, "a")
 
     @staticmethod
     def get_time():
@@ -17,4 +16,6 @@ class Logger:
     def log(self, message):
         log_record = f"{self.get_time()} {message}\n"
         print(message)
+        self.file = open(self.file_path, "a")
         self.file.write(log_record)
+        self.file.close()
