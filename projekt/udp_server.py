@@ -82,7 +82,7 @@ class DeviceManager:
                         # communication with device
                         ret = s.sendto(int(0).to_bytes(3, 'big'), dev)
                         if ret != 3:
-                            cls.logger.log(f"Error while pinging device {id=} (sending)")
+                            cls.logger.error(f"Pinging device {id=} (sending)")
                             # print("Error while sending message")
                             cls.devices.pop(id)
                             cls.logger.log(f"Removed device {id=} from active list")
@@ -90,20 +90,19 @@ class DeviceManager:
 
                         data, _ = s.recvfrom(2)
                         if not data:
-                            cls.logger.log(f"Error while pinging device {id=} (receiving)")
+                            cls.logger.error(f"Pinging device {id=} (receiving)")
                             cls.devices.pop(id)
                             cls.logger.log(f"Removed device {id=} from active list")
                             break
                             # print("Error while receiving response")
                     except TimeoutError:
-                        cls.logger.log(f"Error while pinging device {id=} (timeout)")
+                        cls.logger.error(f"Pinging device {id=} (timeout)")
                         # print("Error while sending message")
                         cls.devices.pop(id)
                         cls.logger.log(f"Removed device {id=} from active list")
                     except Exception as e:
-                        cls.logger.log(f"Error while pinging device {id=} ({e})")
+                        cls.logger.error(f"Pinging device {id=} ({e})")
                         cls.devices.pop(id)
                         cls.logger.log(f"Removed device {id=} from active list")
-
 
             sleep(10)
