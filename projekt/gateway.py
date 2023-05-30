@@ -3,9 +3,11 @@ from sys import argv
 from command_interpreter import analyze_message, HELP_MESSAGE, EXIT_CODE
 from logger import Logger
 from udp_server import DeviceManager
+import threading
 
 HOST = socket.gethostbyname(socket.gethostname())
 PORT = 8000
+UDP_PORT = 8001
 
 START_MESSAGE = "Connected to the gateway." + HELP_MESSAGE
 CONN_CLOSED_MESSAGE = "Connection closed."
@@ -17,6 +19,9 @@ if len(argv) > 1 and argv[1].isdigit() and int(argv[1]) > 0:
     buffer_size = int(argv[1])
 
 logger = Logger()
+
+# Initialize UDP server in another thread
+threading.Thread(None, DeviceManager.start, 'udp_server_thread', (HOST, UDP_PORT), daemon=True).start()
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -44,7 +49,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     if reply == EXIT_CODE:
                         conn.shutdown(socket.SHUT_RDWR)
                         break
-                    conn.send(reply.encode('UTF-8'))
+                    conn.send(str(reply).encode('UTF-8'))
                 except Exception as e:
                     logger.log(e)
                     break

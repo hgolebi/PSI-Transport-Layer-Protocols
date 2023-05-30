@@ -3,20 +3,23 @@ from udp_server import DeviceManager
 HELP_MESSAGE = """
 Available commands:
 > help                              - shows available commands.
+> list                              - shows list of available devices.
 > ping SENSOR_ID                    - checks if sensor is available.
 > read SENSOR_ID REGISTER           - reads value in the given register.
 > config SENSOR_ID REGISTER VALUE   - sets register to the given value.
 > exit                              - closes connection.
 """
-EXIT_CODE = 1
+EXIT_CODE = -1
+DEVICE_NOT_ACTIVE = -2
 INVALID_COMMAND_MESSAGE = "Invalid command. Type 'help' to list available commands."
+DEVICE_NOT_ACTIVE_MESSAGE = "Given device is not active.\nType 'list' to see all active devices."
 WRONG_DEVICE_ID_MESSAGE = 'SENSOR_ID has to be a non-negative integer.'
-WRONG_REGISTER_MESSAGE = '''REGISTER has to be a non-negative integer.
+WRONG_REGISTER_MESSAGE = '''REGISTER has to be a non-negative integer between 0 and 7.
 For binary use '0b' before register number.
-For hexadecimal use '0x' before register number'''
+For hexadecimal use '0x' before register number.'''
 WRONG_VALUE_MESSAGE = '''VALUE has to be a non-negative integer.
 For binary use '0b' before register number.
-For hexadecimal use '0x' before register number'''
+For hexadecimal use '0x' before register number.'''
 
 def ping_command(message_list):
     pass
@@ -29,12 +32,14 @@ def read_command(message_list):
     device_id = device_id_check(device_id)
     if device_id is None:
         return WRONG_DEVICE_ID_MESSAGE
+    if device_id == DEVICE_NOT_ACTIVE:
+        return DEVICE_NOT_ACTIVE_MESSAGE
     register = register_check(register)
     if register is None:
         return WRONG_REGISTER_MESSAGE
 
     return DeviceManager.read_from_device(device_id, register)
-    return f'{command} {str(device_id)} {str(register)}'
+    # return f'{command} {str(device_id)} {str(register)}'
 
 
 
@@ -46,6 +51,8 @@ def config_command(message_list):
     device_id = device_id_check(device_id)
     if device_id is None:
         return WRONG_DEVICE_ID_MESSAGE
+    if device_id == DEVICE_NOT_ACTIVE:
+        return DEVICE_NOT_ACTIVE_MESSAGE
     register = register_check(register)
     if register is None:
         return WRONG_REGISTER_MESSAGE
@@ -56,6 +63,7 @@ def config_command(message_list):
     return DeviceManager.config_device(device_id, register, value)
     # return f'{command} {str(device_id)} {str(register)} {str(value)}'
 
+
 def device_id_check(device_id):
     try:
         device_id = int(device_id)
@@ -63,7 +71,9 @@ def device_id_check(device_id):
         return None
     if device_id < 0:
         return None
-    # TO DO: check if device with given ID is active
+    device_list = DeviceManager.list_devices()
+    if device_id not in device_list:
+        return DEVICE_NOT_ACTIVE
     return device_id
 
 def register_check(register):
@@ -88,7 +98,7 @@ def register_check(register):
         except:
             return None
 
-    if register < 0:
+    if not 0 <= register <= 7:
         return None
 
     return register
@@ -121,12 +131,13 @@ def value_check(value):
     return value
 
 
-
 def analyze_message(message):
     separeted_message = message.lower().split()
     command = separeted_message[0]
     if command == "help":
         return HELP_MESSAGE
+    elif command == "list":
+        return str(DeviceManager.list_devices())
     elif command == "ping":
         return ping_command(separeted_message)
     elif command == "read":

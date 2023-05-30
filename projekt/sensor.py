@@ -5,14 +5,16 @@ import random
 SENSOR_ID = random.randrange(0, 2**16-1)
 REGISTERS = [10 * n for n in range(8)]
 ADDRESS = socket.gethostbyname(socket.gethostname())
-PORT = 10123
+
 
 if len(argv) != 3:
     print('Invalid arguments. Please specify SERVER_ADDRESS and SERVER_PORT')
     exit(-1)
 server = (argv[1], int(argv[2]))
 
+print("Sensor ID: ", SENSOR_ID)
 with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+    s.bind((ADDRESS, 0))
     id_bytes = SENSOR_ID.to_bytes(2, 'big')
     n = s.sendto(id_bytes, server)
     if n != 2:
@@ -23,7 +25,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
         print('Error while connecting to the server')
         exit(-1)
     while True:
-        data, _ = s.recvfrom(3)
+        data, device_manager = s.recvfrom(3)
         if not data:
             print("no data")
             continue
@@ -39,8 +41,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
         id = data[0] & 7
         if (not write):
             val = REGISTERS[id]
-            s.sendto(val.to_bytes(2, 'big'), server)
+            s.sendto(val.to_bytes(2, 'big'), device_manager)
         else:
             val = int.from_bytes(data[1:3], 'big')
             REGISTERS[id] = val
-            s.sendto(val.to_bytes(2, 'big'), server)  # sensor sends back the value to confirm success
+            s.sendto(val.to_bytes(2, 'big'), device_manager)  # sensor sends back the value to confirm success
