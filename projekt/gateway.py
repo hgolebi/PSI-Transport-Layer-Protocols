@@ -1,20 +1,16 @@
 import socket
 from sys import argv
+import threading
+import select
+
 from command_interpreter import analyze_message, HELP_MESSAGE, EXIT_CODE
 from logger import Logger
 from udp_server import DeviceManager
-import threading
-import select
+from codes_and_messages import *
 
 HOST = socket.gethostbyname(socket.gethostname())
 PORT = 8000
 UDP_PORT = 8001
-
-START_MESSAGE = "Connected to the gateway." + HELP_MESSAGE
-CONN_CLOSED_MESSAGE = "Connection closed."
-# ERROR messages
-SEND_ERROR = "ERROR: Couldn't send the message."
-CONNECTION_ERROR = 'ERROR: Something went wrong during session.'
 
 def client_service_thread(conn):
     with conn:

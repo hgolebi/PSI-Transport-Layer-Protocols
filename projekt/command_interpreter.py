@@ -1,25 +1,5 @@
 from udp_server import DeviceManager
-
-HELP_MESSAGE = """
-Available commands:
-> help                              - shows available commands.
-> list                              - shows list of available devices.
-> ping SENSOR_ID                    - checks if sensor is available.
-> read SENSOR_ID REGISTER           - reads value in the given register.
-> config SENSOR_ID REGISTER VALUE   - sets register to the given value.
-> exit                              - closes connection.
-"""
-EXIT_CODE = -1
-DEVICE_NOT_ACTIVE = -2
-INVALID_COMMAND_MESSAGE = "Invalid command. Type 'help' to list available commands."
-DEVICE_NOT_ACTIVE_MESSAGE = "Given device is not active.\nType 'list' to see all active devices."
-WRONG_DEVICE_ID_MESSAGE = 'SENSOR_ID has to be a non-negative integer.'
-WRONG_REGISTER_MESSAGE = '''REGISTER has to be a non-negative integer between 0 and 7.
-For binary use '0b' before register number.
-For hexadecimal use '0x' before register number.'''
-WRONG_VALUE_MESSAGE = '''VALUE has to be a non-negative integer.
-For binary use '0b' before register number.
-For hexadecimal use '0x' before register number.'''
+from codes_and_messages import *
 
 def ping_command(message_list):
     pass
@@ -32,7 +12,7 @@ def read_command(message_list):
     device_id = device_id_check(device_id)
     if device_id is None:
         return WRONG_DEVICE_ID_MESSAGE
-    if device_id == DEVICE_NOT_ACTIVE:
+    if device_id == DEVICE_NOT_ACTIVE_CODE:
         return DEVICE_NOT_ACTIVE_MESSAGE
     register = register_check(register)
     if register is None:
@@ -51,7 +31,7 @@ def config_command(message_list):
     device_id = device_id_check(device_id)
     if device_id is None:
         return WRONG_DEVICE_ID_MESSAGE
-    if device_id == DEVICE_NOT_ACTIVE:
+    if device_id == DEVICE_NOT_ACTIVE_CODE:
         return DEVICE_NOT_ACTIVE_MESSAGE
     register = register_check(register)
     if register is None:
@@ -73,7 +53,7 @@ def device_id_check(device_id):
         return None
     device_list = DeviceManager.list_devices()
     if device_id not in device_list:
-        return DEVICE_NOT_ACTIVE
+        return DEVICE_NOT_ACTIVE_CODE
     return device_id
 
 def register_check(register):
