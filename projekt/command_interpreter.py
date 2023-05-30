@@ -1,4 +1,5 @@
 from udp_server import DeviceManager
+from tabulate import tabulate
 from codes_and_messages import *
 
 def ping_command(message_list):
@@ -117,7 +118,7 @@ def analyze_message(message):
     if command == "help":
         return HELP_MESSAGE
     elif command == "list":
-        return str(DeviceManager.list_devices())
+        return tabulate([(k,) + v for k, v in DeviceManager().list_devices().items()], headers=['id', 'address', 'port'], tablefmt="github") + f"\n Connected sensors: {len(DeviceManager().list_devices())}"
     elif command == "ping":
         return ping_command(separeted_message)
     elif command == "read":
