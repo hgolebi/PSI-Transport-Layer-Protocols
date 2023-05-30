@@ -1,7 +1,8 @@
 import socket
 from sys import argv
-from command_parser import analyze_message, HELP_MESSAGE, EXIT_CODE
+from command_interpreter import analyze_message, HELP_MESSAGE, EXIT_CODE
 from logger import Logger
+from udp_server import DeviceManager
 
 HOST = socket.gethostbyname(socket.gethostname())
 PORT = 8000

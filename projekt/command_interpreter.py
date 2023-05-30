@@ -1,3 +1,5 @@
+from udp_server import DeviceManager
+
 HELP_MESSAGE = """
 Available commands:
 > help                              - shows available commands.
@@ -31,7 +33,7 @@ def read_command(message_list):
     if register is None:
         return WRONG_REGISTER_MESSAGE
 
-    # TO DO: comunicate with device
+    return DeviceManager.read_from_device(device_id, register)
     return f'{command} {str(device_id)} {str(register)}'
 
 
@@ -51,8 +53,8 @@ def config_command(message_list):
     if value is None:
         return WRONG_VALUE_MESSAGE
 
-    # TO DO: communicate with device
-    return f'{command} {str(device_id)} {str(register)} {str(value)}'
+    return DeviceManager.config_device(device_id, register, value)
+    # return f'{command} {str(device_id)} {str(register)} {str(value)}'
 
 def device_id_check(device_id):
     try:
