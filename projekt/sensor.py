@@ -1,6 +1,7 @@
 import socket
 from sys import argv
 import random
+from select import select
 
 SENSOR_ID = random.randrange(0, 2**16-1)
 REGISTERS = [10 * n for n in range(8)]
@@ -14,17 +15,23 @@ server = (argv[1], int(argv[2]))
 
 print("Sensor ID: ", SENSOR_ID)
 with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+    s.setblocking(False)
     s.bind((ADDRESS, 0))
     id_bytes = SENSOR_ID.to_bytes(2, 'big')
+    select([], [s], [], 5)
     n = s.sendto(id_bytes, server)
     if n != 2:
         print("Error while sending initial message")
         exit(-1)
+    rl, _, _ = select([s], [], [], 5)
     return_data, _ = s.recvfrom(2)
     if return_data != id_bytes:
         print('Error while connecting to the server')
         exit(-1)
     while True:
+        rl, _, _ = select([s], [], [], 5)
+        if not rl:
+            continue
         data, device_manager = s.recvfrom(3)
         if not data:
             print("no data")
@@ -41,8 +48,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
         id = data[0] & 7
         if (not write):
             val = REGISTERS[id]
-            s.sendto(val.to_bytes(2, 'big'), device_manager)
         else:
             val = int.from_bytes(data[1:3], 'big')
             REGISTERS[id] = val
-            s.sendto(val.to_bytes(2, 'big'), device_manager)  # sensor sends back the value to confirm success
+        select([], [s], [], 5)
+        s.sendto(val.to_bytes(2, 'big'), device_manager)  # sensor sends back the value to confirm success
