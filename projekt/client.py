@@ -6,6 +6,7 @@ if len(argv) != 3:
     exit(-1)
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    s.settimeout(5)
     try:
         s.connect((argv[1], int(argv[2])))
     except:
