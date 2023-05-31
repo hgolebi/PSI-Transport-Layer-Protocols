@@ -22,12 +22,12 @@ class Logger:
         log_record = f"{message}\n"
         print(log_record)
         self.file = open(self.file_path, "a")
-        self.file.write(log_time+log_record)
+        self.file.write(f"{log_time} {log_record}")
         self.file.close()
     
     def error(self, message):
         log_time = self.get_time()
-        log_record = f"ERROR - {message}\n"
+        log_record = f"ERROR: {message}\n"
         print(self._ansi(91) + log_record + self._ansi(0))
         self.file = open(self.file_path, "a")
         self.file.write(f"{log_time} {log_record}")
