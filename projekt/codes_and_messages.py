@@ -20,8 +20,8 @@ For hexadecimal use '0x' before register number.'''
 CONN_CLOSED_MESSAGE = "Connection closed."
 
 # ERROR messages
-SEND_ERROR = "ERROR: Couldn't send the message."
-CONNECTION_ERROR = 'ERROR: Something went wrong during session.'
+SEND_ERROR = "Couldn't send the message."
+CONNECTION_ERROR = 'Something went wrong during session.'
 
 EXIT_CODE = -1
 DEVICE_NOT_ACTIVE_CODE = -2

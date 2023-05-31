@@ -26,13 +26,13 @@ class DeviceManager:
                     continue
                 data, device = s.recvfrom(2)
                 if not data:
-                    print("Device hasn't send any data")
+                    logger.error("Device hasn't send any data")
                     continue
                 id = int.from_bytes(data, "big")
                 select([], [s], [], 5)
                 ret = s.sendto(data, device)
                 if ret != len(data):
-                    print("Error while sending response")
+                    logger.error("Error while sending response")
                     continue
                 cls.devices[id] = device
                 cls.logger.log(f"Device {id=} added to connected list")
@@ -50,12 +50,12 @@ class DeviceManager:
             select([], [s], [], 5)
             ret = s.sendto(query_byte + value_bytes, cls.devices[device_id])
             if ret != 3:
-                print("Error while sending message")
+                logger.error("Error while sending message")
                 return MESSAGE_SENT_INCORRECTLY_CODE       # TO DO
             select([s], [], [], 5)
             data, _ = s.recvfrom(2)
             if not data:
-                print("Error while receiving response")
+                logger.error("Error while receiving response")
                 return DID_NOT_RECEIVE_DATA_CODE       # TO DO
             return int.from_bytes(data, 'big')
 
@@ -72,15 +72,15 @@ class DeviceManager:
             select([], [s], [], 5)
             ret = s.sendto(query_byte  + value_byte, cls.devices[device_id])
             if ret != 3:
-                print("Error while sending message")
+                logger.error("Error while sending message")
                 return MESSAGE_SENT_INCORRECTLY_CODE       # TO DO
             select([s], [], [], 5)
             data, _ = s.recvfrom(2)
             if not data:
-                print("Error while receiving response")
+                logger.error("Error while receiving response")
                 return DID_NOT_RECEIVE_DATA_CODE       # TO DO
             if data != value_byte:
-                print("Device returned different configuration")
+                logger.error("Device returned different configuration")
                 return VALUES_DOES_NOT_EQUAL_CODE       # TO DO
             return int.from_bytes(data, 'big')
 

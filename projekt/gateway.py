@@ -12,15 +12,15 @@ HOST = socket.gethostbyname(socket.gethostname())
 PORT = 8000
 UDP_PORT = 8001
 
-def client_service_thread(conn):
+def client_service_thread(conn, addr):
     with conn:
         conn.setblocking(False)
         try:
             select.select([], [conn], [], 5)
             conn.send(START_MESSAGE.encode('UTF-8'))
         except Exception as e:
-            logger.log(SEND_ERROR, CONN_CLOSED_MESSAGE)
-            logger.log(e)
+            logger.error(SEND_ERROR, CONN_CLOSED_MESSAGE)
+            logger.error(e)
             return
         while True:
             try:
@@ -31,7 +31,7 @@ def client_service_thread(conn):
                 if not data:
                     break
                 message = data.decode('UTF-8')
-                logger.log(f"Client: {message}")
+                logger.log(f"Client {addr}: {message}")
                 reply = analyze_message(message)
                 if reply == EXIT_CODE:
                     conn.shutdown(socket.SHUT_RDWR)
@@ -39,11 +39,11 @@ def client_service_thread(conn):
                 select.select([], [conn], [], 5)
                 conn.send(str(reply).encode('UTF-8'))
             except Exception as e:
-                logger.log(CONNECTION_ERROR)
-                logger.log(e)
+                logger.error(CONNECTION_ERROR)
+                logger.error(e)
                 break
         conn.close()
-    logger.log("Connection closed.")
+    logger.log(f"Connection closed. {addr}")
 
 
 if len(argv) > 1 and argv[1].isdigit() and int(argv[1]) > 0:
@@ -67,7 +67,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 continue
             conn, addr = s.accept()
             logger.log(f"Connected by {addr}")
-            threading.Thread(target=client_service_thread, args=[conn, ], daemon=True).start()
+            threading.Thread(target=client_service_thread, args=[conn, addr, ], daemon=True).start()
         except Exception as e:
-            logger.log(e)
+            logger.error(e)
             continue
