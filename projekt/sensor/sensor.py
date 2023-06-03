@@ -44,6 +44,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
         # 6th, 7th and 8th bit: register id (6th bit is msb, 8th bit is lsb)
         # 2nd byte represents most significant byte of the value
         # 3rd byte represents least significant byte of the value
+
         print(data)
         write = (data[0] >> 3) & 1
         id = data[0] & 7
