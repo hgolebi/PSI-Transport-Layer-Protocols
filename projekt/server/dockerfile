@@ -1,4 +1,6 @@
 FROM python:3.10
+RUN pip install --upgrade pip
+RUN pip install tabulate
 COPY . /gateway_server
 WORKDIR /gateway_server/
 ENTRYPOINT ["python", "./gateway.py"]
