@@ -41,7 +41,7 @@ class DeviceManager:
     @classmethod
     def read_from_device(cls, device_id, register):
         if not cls.ping(device_id):
-            return DEVICE_NOT_ACTIVE_CODE
+            return DEVICE_STOPED_RESPONDING_ERROR
         with socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM) as s:
             s.setblocking(False)
             register = register & 7
@@ -50,19 +50,19 @@ class DeviceManager:
             select([], [s], [], 5)
             ret = s.sendto(query_byte + value_bytes, cls.devices[device_id])
             if ret != 3:
-                logger.error("Error while sending message")
-                return MESSAGE_SENT_INCORRECTLY_CODE       # TO DO
+                cls.logger.error("Error while sending message")
+                return MESSAGE_SENT_INCORRECTLY_ERROR       # TO DO
             select([s], [], [], 5)
             data, _ = s.recvfrom(2)
             if not data:
-                logger.error("Error while receiving response")
-                return DID_NOT_RECEIVE_DATA_CODE       # TO DO
+                cls.logger.error("Error while receiving response")
+                return DID_NOT_RECEIVE_DATA_ERROR       # TO DO
             return int.from_bytes(data, 'big')
 
     @classmethod
     def config_device(cls, device_id, register, value):
         if not cls.ping(device_id):
-            return DEVICE_NOT_ACTIVE_CODE
+            return DEVICE_STOPED_RESPONDING_ERROR
         with socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM) as s:
             s.setblocking(False)
             register = register | 8
@@ -72,16 +72,16 @@ class DeviceManager:
             select([], [s], [], 5)
             ret = s.sendto(query_byte  + value_byte, cls.devices[device_id])
             if ret != 3:
-                logger.error("Error while sending message")
-                return MESSAGE_SENT_INCORRECTLY_CODE       # TO DO
+                cls.logger.error("Error while sending message")
+                return MESSAGE_SENT_INCORRECTLY_ERROR       # TO DO
             select([s], [], [], 5)
             data, _ = s.recvfrom(2)
             if not data:
-                logger.error("Error while receiving response")
-                return DID_NOT_RECEIVE_DATA_CODE       # TO DO
+                cls.logger.error("Error while receiving response")
+                return DID_NOT_RECEIVE_DATA_ERROR       # TO DO
             if data != value_byte:
-                logger.error("Device returned different configuration")
-                return VALUES_DOES_NOT_EQUAL_CODE       # TO DO
+                cls.logger.error("Device returned different configuration")
+                return VALUES_DOES_NOT_EQUAL_ERROR       # TO DO
             return int.from_bytes(data, 'big')
 
     @classmethod

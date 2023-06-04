@@ -2,7 +2,6 @@ HELP_MESSAGE = """
 Available commands:
 > help                              - shows available commands.
 > list                              - shows list of available devices.
-> ping SENSOR_ID                    - checks if sensor is available.
 > read SENSOR_ID REGISTER           - reads value in the given register.
 > config SENSOR_ID REGISTER VALUE   - sets register to the given value.
 > exit                              - closes connection.
@@ -22,7 +21,12 @@ CONN_CLOSED_MESSAGE = "Connection closed."
 # ERROR messages
 SEND_ERROR = "Couldn't send the message."
 CONNECTION_ERROR = 'Something went wrong during session.'
+MESSAGE_SENT_INCORRECTLY_ERROR = 'Something went wrong while sending message to the device.'
+DID_NOT_RECEIVE_DATA_ERROR = "Didn't receive any data from device."
+VALUES_DOES_NOT_EQUAL_ERROR = "Devices response is different from the given value. There's a probability that the register hasn't been set properly."
+DEVICE_STOPED_RESPONDING_ERROR = 'Device stopped responding.'
 
+# ERROR CODES
 EXIT_CODE = -1
 DEVICE_NOT_ACTIVE_CODE = -2
 MESSAGE_SENT_INCORRECTLY_CODE = -3
