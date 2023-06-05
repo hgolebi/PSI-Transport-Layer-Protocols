@@ -1,9 +1,11 @@
+"""
+Brama komunikacyjna dla urządzeń sensorycznych
+Hubert Gołębiowski, Bartosz Pomiankiewicz, Bartłomiej Rodzik
+27.05.2023
+"""
 from udp_server import DeviceManager
 from tabulate import tabulate
 from codes_and_messages import *
-
-def ping_command(message_list):
-    pass
 
 
 def read_command(message_list):
@@ -20,7 +22,6 @@ def read_command(message_list):
         return WRONG_REGISTER_MESSAGE
 
     return DeviceManager.read_from_device(device_id, register)
-    # return f'{command} {str(device_id)} {str(register)}'
 
 
 
@@ -42,7 +43,6 @@ def config_command(message_list):
         return WRONG_VALUE_MESSAGE
 
     return DeviceManager.config_device(device_id, register, value)
-    # return f'{command} {str(device_id)} {str(register)} {str(value)}'
 
 
 def device_id_check(device_id):
@@ -118,9 +118,8 @@ def analyze_message(message):
     if command == "help":
         return HELP_MESSAGE
     elif command == "list":
-        return tabulate([(k,) + v for k, v in DeviceManager().list_devices().items()], headers=['id', 'address', 'port'], tablefmt="outline") + f"\n Connected sensors: {len(DeviceManager().list_devices())}"
-    # elif command == "ping":
-    #     return ping_command(separeted_message)
+        devices = DeviceManager().list_devices()
+        return tabulate([(k,) + v for k, v in devices.items()], headers=['id', 'address', 'port'], tablefmt="outline") + f"\n Connected sensors: {len(devices)}"
     elif command == "read":
         return read_command(separeted_message)
     elif command == "config":

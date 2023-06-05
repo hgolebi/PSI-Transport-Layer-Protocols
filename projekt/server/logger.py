@@ -1,3 +1,8 @@
+"""
+Brama komunikacyjna dla urządzeń sensorycznych
+Hubert Gołębiowski, Bartosz Pomiankiewicz, Bartłomiej Rodzik
+26.05.2023
+"""
 import os
 from datetime import datetime
 

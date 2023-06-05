@@ -1,3 +1,8 @@
+"""
+Brama komunikacyjna dla urządzeń sensorycznych
+Hubert Gołębiowski, Bartosz Pomiankiewicz, Bartłomiej Rodzik
+20.05.2023
+"""
 import socket
 from sys import argv
 import threading

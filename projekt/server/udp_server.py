@@ -1,3 +1,8 @@
+"""
+Brama komunikacyjna dla urządzeń sensorycznych
+Hubert Gołębiowski, Bartosz Pomiankiewicz, Bartłomiej Rodzik
+27.05.2023
+"""
 import socket
 import threading
 from time import sleep
@@ -15,7 +20,6 @@ class DeviceManager:
         with socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM) as s:
             s.bind((address, port))
             s.setblocking(False)
-            # print("UDP server up and listening on ", address, port)
             cls.logger = logger
             cls.logger.log(f"UDP server up and listening on {address} {port}")
             threading.Thread(target=DeviceManager.check_devices, daemon=True).start()
@@ -51,12 +55,12 @@ class DeviceManager:
             ret = s.sendto(query_byte + value_bytes, cls.devices[device_id])
             if ret != 3:
                 cls.logger.error("Error while sending message")
-                return MESSAGE_SENT_INCORRECTLY_ERROR       # TO DO
+                return MESSAGE_SENT_INCORRECTLY_ERROR
             select([s], [], [], 5)
             data, _ = s.recvfrom(2)
             if not data:
                 cls.logger.error("Error while receiving response")
-                return DID_NOT_RECEIVE_DATA_ERROR       # TO DO
+                return DID_NOT_RECEIVE_DATA_ERROR
             return int.from_bytes(data, 'big')
 
     @classmethod
@@ -73,15 +77,15 @@ class DeviceManager:
             ret = s.sendto(query_byte  + value_byte, cls.devices[device_id])
             if ret != 3:
                 cls.logger.error("Error while sending message")
-                return MESSAGE_SENT_INCORRECTLY_ERROR       # TO DO
+                return MESSAGE_SENT_INCORRECTLY_ERROR
             select([s], [], [], 5)
             data, _ = s.recvfrom(2)
             if not data:
                 cls.logger.error("Error while receiving response")
-                return DID_NOT_RECEIVE_DATA_ERROR       # TO DO
+                return DID_NOT_RECEIVE_DATA_ERROR
             if data != value_byte:
                 cls.logger.error("Device returned different configuration")
-                return VALUES_DOES_NOT_EQUAL_ERROR       # TO DO
+                return VALUES_DOES_NOT_EQUAL_ERROR
             return int.from_bytes(data, 'big')
 
     @classmethod
@@ -98,7 +102,6 @@ class DeviceManager:
                 ret = s.sendto(int(0).to_bytes(3, 'big'), device)
                 if ret != 3:
                     cls.logger.error(f"Pinging device {id=} (sending)")
-                    # print("Error while sending message")
                     cls.devices.pop(id)
                     cls.logger.log(f"Removed device {id=} from active list")
                     return False
@@ -109,10 +112,8 @@ class DeviceManager:
                     cls.devices.pop(id)
                     cls.logger.log(f"Removed device {id=} from active list")
                     return False
-                    # print("Error while receiving response")
             except TimeoutError:
                 cls.logger.error(f"Pinging device {id=} (timeout)")
-                # print("Error while sending message")
                 cls.devices.pop(id)
                 cls.logger.log(f"Removed device {id=} from active list")
                 return False
@@ -126,9 +127,6 @@ class DeviceManager:
     @classmethod
     def check_devices(cls):
         while True:
-            # try:
             for id in list(cls.devices):
                 cls.ping(id)
             sleep(10)
-            # except:
-            #     continue
