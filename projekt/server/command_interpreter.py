@@ -106,7 +106,7 @@ def value_check(value):
         except:
             return None
 
-    if value < 0:
+    if value < 0 or value > 2**16-1:
         return None
 
     return value
