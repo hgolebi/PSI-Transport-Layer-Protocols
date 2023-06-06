@@ -18,11 +18,11 @@ if len(argv) != 3:
     print('Invalid arguments. Please specify SERVER_ADDRESS and SERVER_PORT')
     exit(-1)
 
-try:
-    ipaddress.ip_address(argv[1])
-except ValueError:
-    print("Invalid argument. SERVER_ADDRESS must be ip address")
-    exit(-1)
+# try:
+#     ipaddress.ip_address(argv[1])
+# except ValueError:
+#     print("Invalid argument. SERVER_ADDRESS must be ip address")
+#     exit(-1)
 try:
     int(argv[2])
 except:
